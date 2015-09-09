@@ -1,5 +1,8 @@
-/* jonathan potter */
-/* github.com/jonathan-potter */
+/*
+  programmer: jonathan potter
+  github: https://github.com/jonathan-potter
+  repo: https://github.com/jonathan-potter/shadertoy-fractal
+*/
 
 const int MAX_ITERATIONS = 64;
 
