@@ -4,7 +4,7 @@
   repo: https://github.com/jonathan-potter/shadertoy-fractal
 */
 
-const int MAX_ITERATIONS = 64;
+const int MAX_ITERATIONS = 256;
 
 struct complex { 
   float real;
@@ -36,7 +36,9 @@ int mandelbrot(float x, float y) {
 }
 
 int animatedJulia(float x, float y) {
-  complex c = complex(-0.835 * cos(iGlobalTime * 0.25), 0.2321);
+  float animationOffset = 0.055 * cos(iGlobalTime * 2.0);
+
+  complex c = complex(-0.795 + animationOffset, 0.2321);
   complex z = complex(x, y);
 
   return fractal(c, z);
@@ -57,7 +59,7 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord ) {
 
   int crossoverIteration = animatedJulia(float(coordinate.x), float(coordinate.y));
     
-  float color = float(crossoverIteration) / float(MAX_ITERATIONS);
+  float color = 6.0 * float(crossoverIteration) / float(MAX_ITERATIONS);
 
   fragColor = vec4(color, color, color, 1.0);
 }
