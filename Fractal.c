@@ -21,7 +21,7 @@ int fractal(complex c, complex z) {
     z.real = real;
     z.imaginary = imaginary;
 
-    if (z.real * z.real + z.imaginary + z.imaginary > 4.0) {
+    if (z.real * z.real + z.imaginary * z.imaginary > 4.0) {
       return iteration;
     }
   }

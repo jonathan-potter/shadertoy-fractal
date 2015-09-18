@@ -4,15 +4,30 @@
   repo: https://github.com/jonathan-potter/shadertoy-fractal
 */
 
-const int MAX_ITERATIONS = 256;
+const int MAX_ITERATIONS = 64;
+const float ITERATIONS_PER_SECOND = 32.0;
+const float pi = 3.14159;
+    
+float modulus(float number, float divisor) {
+  float integerQuotient = floor(number / divisor);
+    
+  return number - (integerQuotient * divisor);
+}
+
+float rampFunction(float t) {
+  float animationPeriod = float(MAX_ITERATIONS);
+    
+  return modulus(t, animationPeriod);
+}
 
 struct complex { 
   float real;
   float imaginary;
 };
 
-int fractal(complex c, complex z) {
+int fractal(complex c, complex z, int iterations) {
   for (int iteration = 0; iteration < MAX_ITERATIONS; iteration++) {
+    if (iteration >= iterations) {return 0;}
 
     // z <- z^2 + c
     float real = z.real * z.real - z.imaginary * z.imaginary + c.real;
@@ -29,46 +44,31 @@ int fractal(complex c, complex z) {
   return 0;
 }
 
-int mandelbrot(vec2 coordinate) {
+int mandelbrot(vec2 coordinate, int iterations) {
   complex c = complex(coordinate.x, coordinate.y);
   complex z = complex(0.0, 0.0);
 
-  return fractal(c, z);
-}
-
-int julia(vec2 coordinate, vec2 offset) {
-  complex c = complex(offset.x, offset.y);
-  complex z = complex(coordinate.x, coordinate.y);
-
-  return fractal(c, z);
+  return fractal(c, z, iterations);
 }
 
 vec2 fragCoordToXY(vec2 fragCoord) {
   vec2 relativePosition = fragCoord.xy / iResolution.xy;
   float aspectRatio = iResolution.x / iResolution.y;
 
-  vec2 cartesianPosition = (relativePosition - 0.5) * 4.0;
+  vec2 cartesianPosition = (relativePosition - 0.5) * 3.0;
   cartesianPosition.x *= aspectRatio;
 
   return cartesianPosition;
 }
 
 void mainImage( out vec4 fragColor, in vec2 fragCoord ) {
-  vec2 coordinate    = fragCoordToXY(fragCoord);
-  vec2 clickPosition = fragCoordToXY(vec2(iMouse.x, iMouse.y));
-
-  int julia = julia(coordinate, clickPosition);
-  int mandelbrot = mandelbrot(coordinate);
+  int iterations = int(floor(rampFunction((iGlobalTime * ITERATIONS_PER_SECOND))));
     
-  float point;  
-  if(length(clickPosition - coordinate) < 0.05){
-    point = 1.0;
-  } else {
-    point = 0.0;
-  }
-    
-  float juliaColor      = 5.0 * float(julia) / float(MAX_ITERATIONS);
-  float mandelbrotColor = 5.0 * float(mandelbrot) / float(MAX_ITERATIONS);
+  vec2 coordinate = fragCoordToXY(fragCoord);
 
-  fragColor = vec4(mandelbrotColor, juliaColor, point, 1.0);
+  int crossoverIteration = mandelbrot(coordinate, iterations);
+    
+  float color = 1.0 * float(crossoverIteration) / float(iterations);
+
+  fragColor = vec4(color, color, color, 1.0);
 }
