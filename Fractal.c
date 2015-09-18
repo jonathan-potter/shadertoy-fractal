@@ -12,20 +12,21 @@ struct complex {
 };
 
 int fractal(complex c, complex z) {
-  int crossoverIteration = 0;
   for (int iteration = 0; iteration < MAX_ITERATIONS; iteration++) {
+
+    // z <- z^2 + c
     float real = z.real * z.real - z.imaginary * z.imaginary + c.real;
     float imaginary = 2.0 * z.real * z.imaginary + c.imaginary;
 
     z.real = real;
     z.imaginary = imaginary;
 
-    if (z.real * z.real + z.imaginary + z.imaginary > 4.0 && crossoverIteration == 0) {
+    if (z.real * z.real + z.imaginary + z.imaginary > 4.0) {
       return iteration;
     }
   }
 
-  return 0;
+  return MAX_ITERATIONS;
 }
 
 int mandelbrot(float x, float y) {
@@ -48,7 +49,7 @@ vec2 fragCoordToXY(vec2 fragCoord) {
   vec2 relativePosition = fragCoord.xy / iResolution.xy;
   float aspectRatio = iResolution.x / iResolution.y;
 
-  vec2 cartesianPosition = (relativePosition - 0.5) * 4.0;
+  vec2 cartesianPosition = (relativePosition - 0.5) * 4.0 / (1.30 - cos(iGlobalTime * 1.0));
   cartesianPosition.x *= aspectRatio;
 
   return cartesianPosition;
@@ -59,7 +60,7 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord ) {
 
   int crossoverIteration = animatedJulia(float(coordinate.x), float(coordinate.y));
     
-  float color = 6.0 * float(crossoverIteration) / float(MAX_ITERATIONS);
+  float color = 5.0 * float(crossoverIteration) / float(MAX_ITERATIONS);
 
   fragColor = vec4(color, color, color, 1.0);
 }
